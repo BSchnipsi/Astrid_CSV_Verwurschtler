@@ -31,7 +31,7 @@ def transform(df):
     output["gkonto"] = "4000"
 
     output["belegnr"] = df["ReNr."]
-    output["belegdatum"] = df["Datum"]
+   # output["belegdatum"] = df["Datum"]
     output["buchsymbol"] = df["BS"]
 
     output["buchcode"] = "1"
