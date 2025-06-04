@@ -24,32 +24,32 @@ def load_csv_with_kundennummer(file):
 
 # Transform to the desired output format
 def transform(df):
-df.columns = df.columns.str.strip()  # Clean up column names
+    df.columns = df.columns.str.strip()  # Clean up column names
 
-output = pd.DataFrame()
-output["satzart"] = ["0"] * len(df)
-output["konto"] = ["200000"] * len(df)
-output["gkonto"] = ["4000"] * len(df)
+    output = pd.DataFrame()
+    output["satzart"] = ["0"] * len(df)
+    output["konto"] = ["200000"] * len(df)
+    output["gkonto"] = ["4000"] * len(df)
 
-output["belegnr"] = df["ReNr."]
-output["belegdatum"] = df["Datum"]
-output["buchsymbol"] = df["BS"]
+    output["belegnr"] = df["ReNr."]
+    output["belegdatum"] = df["Datum"]
+    output["buchsymbol"] = df["BS"]
 
-output["buchcode"] = ["1"] * len(df)
-output["prozent"] = ["20"] * len(df)
-output["steuercode"] = ["1"] * len(df)
+    output["buchcode"] = ["1"] * len(df)
+    output["prozent"] = ["20"] * len(df)
+    output["steuercode"] = ["1"] * len(df)
 
-# Handle comma-as-decimal conversion
-output["betrag"] = pd.to_numeric(
-df["Brutto"].astype(str).str.replace(",", "."), errors="coerce"
-)
-output["steuer"] = -pd.to_numeric(
-df["Ust."].astype(str).str.replace(",", "."), errors="coerce"
-)
+    # Handle comma-as-decimal conversion
+    output["betrag"] = pd.to_numeric(
+        df["Brutto"].astype(str).str.replace(",", "."), errors="coerce"
+    )
+    output["steuer"] = -pd.to_numeric(
+        df["Ust."].astype(str).str.replace(",", "."), errors="coerce"
+    )
 
-output["text"] = df["Name"]
+    output["text"] = df["Name"]
 
-return output
+    return output
 
 
 if uploaded_file:
