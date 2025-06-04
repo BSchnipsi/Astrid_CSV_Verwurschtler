@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.title("CSV Transformer Tool")
+st.title("Astrids CSV-Verwurschtler")
 
 uploaded_file = st.file_uploader("Upload your CSV file (semicolon-separated)", type=["csv"])
 
@@ -67,5 +67,11 @@ if uploaded_file:
     st.subheader("Transformed Data")
     st.dataframe(transformed_df)
 
-    csv = transformed_df.to_csv(index=False, sep=';').encode('utf-8')
-    st.download_button("Download Transformed CSV", csv, "transformed.csv", "text/csv")
+# Format numeric columns with comma as decimal separator
+transformed_df["betrag"] = transformed_df["betrag"].map(lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if pd.notnull(x) else "")
+transformed_df["steuer"] = transformed_df["steuer"].map(lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if pd.notnull(x) else "")
+
+# Create downloadable CSV with semicolon separator
+csv = transformed_df.to_csv(index=False, sep=';', encoding='utf-8').encode('utf-8')
+st.download_button("Download Transformed CSV", csv, "transformed.csv", "text/csv")
+
