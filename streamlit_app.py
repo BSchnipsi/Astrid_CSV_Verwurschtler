@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.title("CSV Tradsfasdfansformer Tool")
+st.title("Astrids CSV-Verwurschtler")
 
 uploaded_file = st.file_uploader("Upload your CSV file (semicolon-separated)", type=["csv"])
 
