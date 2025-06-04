@@ -3,7 +3,7 @@ import pandas as pd
 
 st.title("Astrids CSV-Verwurschtler")
 
-uploaded_file = st.file_uploader("Upload your CSV file (semicolon-separated)", type=["csv"])
+uploaded_file = st.file_uploader("Upload hhyour CSV file (semicolon-separated)", type=["csv"])
 
 # Load the CSV starting from the row where the first cell is 'Kundennummer'
 def load_csv_with_kundennummer(file):
