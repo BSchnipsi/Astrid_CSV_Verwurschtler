@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Astrids CSV-Verwurschtler")
+st.title("CSV Transformer Tool")
 
 uploaded_file = st.file_uploader("Upload your CSV file (semicolon-separated)", type=["csv"])
 
@@ -11,21 +11,22 @@ def transform(df):
         df.iloc[:, 1] = pd.to_numeric(df.iloc[:, 1], errors='coerce') * 2
     return df
 
-if uploaded_file:
-    try:
-        # Try to read with semicolon delimiter first
-        df = pd.read_csv(uploaded_file, delimiter=';')
-        st.success("CSV loaded successfully with semicolon delimiter.")
-    except Exception as e:
-        st.error(f"Failed to parse CSV: {e}")
-        st.stop()
+def load_csv_with_kundennummer(file):
+    # Read all lines first to search for header row
+    raw_lines = file.getvalue().decode("utf-8").splitlines()
 
-    st.subheader("Original Data")
-    st.dataframe(df)
+    header_index = None
+    for i, line in enumerate(raw_lines):
+        if line.startswith("Kundennummer"):
+            header_index = i
+            break
 
-    transformed_df = transform(df)
-    st.subheader("Transformed Data")
-    st.dataframe(transformed_df)
+    if header_index is None:
+        raise ValueError("Header row with 'Kundennummer' not found.")
 
-    csv = transformed_df.to_csv(index=False, sep=';').encode('utf-8')
-    st.download_button("Download Transformed CSV", csv, "transformed.csv", "text/csv")
+    # Re-read the file from the header row
+    data_str = "\n".join(raw_lines[header_index:])
+    from io import StringIO
+    return pd.read_csv(StringIO(data_str), delimiter=';')
+
+if uplo
