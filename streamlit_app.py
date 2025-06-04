@@ -24,7 +24,13 @@ def load_csv_with_kundennummer(file):
 
 # Transform to the desired output format
 def transform(df):
-    df.columns = df.columns.str.strip()  # Clean up column names
+    df.columns = df.columns.str.strip()  # Clean column names
+
+    # Filter only rows where BS is "AR" or "ST"
+    df = df[df["BS"].isin(["AR", "ST"])]
+
+    # Sort by 'ReNr.' (belegnr)
+    df = df.sort_values(by="ReNr.")
 
     output = pd.DataFrame()
     output["satzart"] = ["0"] * len(df)
@@ -39,7 +45,6 @@ def transform(df):
     output["prozent"] = ["20"] * len(df)
     output["steuercode"] = ["1"] * len(df)
 
-    # Convert from comma to dot, then to float
     output["betrag"] = pd.to_numeric(
         df["Brutto"].astype(str).str.replace(",", "."), errors="coerce"
     )
@@ -50,6 +55,7 @@ def transform(df):
     output["text"] = df["Name"]
 
     return output
+
 
 if uploaded_file:
     try:
