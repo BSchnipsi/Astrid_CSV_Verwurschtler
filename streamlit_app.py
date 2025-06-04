@@ -29,4 +29,20 @@ def load_csv_with_kundennummer(file):
     from io import StringIO
     return pd.read_csv(StringIO(data_str), delimiter=';')
 
-if uplo
+if uploaded_file:
+    try:
+        df = load_csv_with_kundennummer(uploaded_file)
+        st.success("CSV loaded successfully from 'Kundennummer' header row.")
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
+        st.stop()
+
+    st.subheader("Original Data")
+    st.dataframe(df)
+
+    transformed_df = transform(df)
+    st.subheader("Transformed Data")
+    st.dataframe(transformed_df)
+
+    csv = transformed_df.to_csv(index=False, sep=';').encode('utf-8')
+    st.download_button("Download Transformed CSV", csv, "transformed.csv", "text/csv")
