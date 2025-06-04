@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Astrids CSV-Verwurschtler")
+st.title("CSV Tradsfasdfansformer Tool")
 
-uploaded_file = st.file_uploader("Upload hhyour CSV file (semicolon-separated)", type=["csv"])
+uploaded_file = st.file_uploader("Upload your CSV file (semicolon-separated)", type=["csv"])
 
 # Load the CSV starting from the row where the first cell is 'Kundennummer'
 def load_csv_with_kundennummer(file):
@@ -39,7 +39,7 @@ def transform(df):
     output["prozent"] = ["20"] * len(df)
     output["steuercode"] = ["1"] * len(df)
 
-    # Handle comma-as-decimal conversion
+    # Convert from comma to dot, then to float
     output["betrag"] = pd.to_numeric(
         df["Brutto"].astype(str).str.replace(",", "."), errors="coerce"
     )
@@ -50,7 +50,6 @@ def transform(df):
     output["text"] = df["Name"]
 
     return output
-
 
 if uploaded_file:
     try:
@@ -64,14 +63,20 @@ if uploaded_file:
     st.dataframe(df)
 
     transformed_df = transform(df)
+
     st.subheader("Transformed Data")
     st.dataframe(transformed_df)
 
-# Format numeric columns with comma as decimal separator
-transformed_df["betrag"] = transformed_df["betrag"].map(lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if pd.notnull(x) else "")
-transformed_df["steuer"] = transformed_df["steuer"].map(lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if pd.notnull(x) else "")
+    # Format numbers using comma as decimal separator
+    transformed_df["betrag"] = transformed_df["betrag"].map(
+        lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        if pd.notnull(x) else ""
+    )
+    transformed_df["steuer"] = transformed_df["steuer"].map(
+        lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        if pd.notnull(x) else ""
+    )
 
-# Create downloadable CSV with semicolon separator
-csv = transformed_df.to_csv(index=False, sep=';', encoding='utf-8').encode('utf-8')
-st.download_button("Download Transformed CSV", csv, "transformed.csv", "text/csv")
-
+    # Create downloadable CSV with semicolon separator
+    csv = transformed_df.to_csv(index=False, sep=';', encoding='utf-8').encode('utf-8')
+    st.download_button("Download Transformed CSV", csv, "transformed.csv", "text/csv")
