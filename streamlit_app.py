@@ -69,6 +69,15 @@ if uploaded_file:
 
     transformed_df = transform(df)
 
+# Show group totals by 'buchsymbol'
+st.subheader("Sum of 'betrag' grouped by 'buchsymbol'")
+grouped = transformed_df.groupby("buchsymbol")["betrag"].sum().reset_index()
+grouped["betrag"] = grouped["betrag"].map(
+    lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+)
+st.dataframe(grouped)
+
+    
     st.subheader("Transformed Data")
     st.dataframe(transformed_df)
 
