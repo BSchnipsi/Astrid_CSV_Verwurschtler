@@ -24,19 +24,22 @@ def load_csv_with_kundennummer(file):
 
 # Transform to the desired output format
 def transform(df):
+    # Ensure clean column names
+    df.columns = df.columns.str.strip()
+
     output = pd.DataFrame()
 
-    output["satzart"] = "0"
-    output["konto"] = "200000"
-    output["gkonto"] = "4000"
+    output["satzart"] = ["0"] * len(df)
+    output["konto"] = ["200000"] * len(df)
+    output["gkonto"] = ["4000"] * len(df)
 
     output["belegnr"] = df["ReNr."]
-   # output["belegdatum"] = df["Datum"]
+    output["belegdatum"] = df["Datum"]
     output["buchsymbol"] = df["BS"]
 
-    output["buchcode"] = "1"
-    output["prozent"] = "20"
-    output["steuercode"] = "1"
+    output["buchcode"] = ["1"] * len(df)
+    output["prozent"] = ["20"] * len(df)
+    output["steuercode"] = ["1"] * len(df)
 
     output["betrag"] = pd.to_numeric(df["Brutto"], errors="coerce")
     output["steuer"] = -pd.to_numeric(df["Ust."], errors="coerce")
