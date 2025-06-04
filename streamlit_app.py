@@ -5,34 +5,50 @@ st.title("CSV Transformer Tool")
 
 uploaded_file = st.file_uploader("Upload your CSV file (semicolon-separated)", type=["csv"])
 
-def transform(df):
-    if df.shape[1] >= 2:
-        df.iloc[:, 0] = df.iloc[:, 0].astype(str).str.upper()
-        df.iloc[:, 1] = pd.to_numeric(df.iloc[:, 1], errors='coerce') * 2
-    return df
-
+# Load the CSV starting from the row where the first cell is 'Kundennummer'
 def load_csv_with_kundennummer(file):
-    # Read all lines first to search for header row
     raw_lines = file.getvalue().decode("utf-8").splitlines()
 
     header_index = None
     for i, line in enumerate(raw_lines):
-        if line.startswith("Kundennummer"):
+        if line.strip().startswith("Kundennummer"):
             header_index = i
             break
 
     if header_index is None:
         raise ValueError("Header row with 'Kundennummer' not found.")
 
-    # Re-read the file from the header row
     data_str = "\n".join(raw_lines[header_index:])
     from io import StringIO
     return pd.read_csv(StringIO(data_str), delimiter=';')
 
+# Transform to the desired output format
+def transform(df):
+    output = pd.DataFrame()
+
+    output["satzart"] = "0"
+    output["konto"] = "200000"
+    output["gkonto"] = "4000"
+
+    output["belegnr"] = df["ReNr."]
+    output["belegdatum"] = df["Datum\r"]  # This column name has a carriage return; can be cleaned later
+    output["buchsymbol"] = df["BS"]
+
+    output["buchcode"] = "1"
+    output["prozent"] = "20"
+    output["steuercode"] = "1"
+
+    output["betrag"] = pd.to_numeric(df["Brutto"], errors="coerce")
+    output["steuer"] = -pd.to_numeric(df["Ust."], errors="coerce")
+
+    output["text"] = df["Name"]
+
+    return output
+
 if uploaded_file:
     try:
         df = load_csv_with_kundennummer(uploaded_file)
-        st.success("CSV loaded successfully from 'Kundennummer' header row.")
+        st.success("CSV loaded successfully from 'Kundennummer' row.")
     except Exception as e:
         st.error(f"Error reading file: {e}")
         st.stop()
