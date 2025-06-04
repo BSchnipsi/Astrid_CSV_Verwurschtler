@@ -31,7 +31,7 @@ def transform(df):
     output["gkonto"] = "4000"
 
     output["belegnr"] = df["ReNr."]
-    output["belegdatum"] = df["Datum\r"]  # This column name has a carriage return; can be cleaned later
+    output["belegdatum"] = df["Datum"]
     output["buchsymbol"] = df["BS"]
 
     output["buchcode"] = "1"
