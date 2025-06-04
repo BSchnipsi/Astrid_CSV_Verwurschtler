@@ -27,34 +27,33 @@ def transform(df):
     df.columns = df.columns.str.strip()  # Clean column names
 
     # Filter only rows where BS is "AR" or "ST"
-    df = df[df["BS"].isin(["AR", "ST"])]
+    df = df[df["BS"].isin(["AR", "ST"])].copy()
 
     # Sort by 'ReNr.' (belegnr)
-    df = df.sort_values(by="ReNr.")
+    df = df.sort_values(by="ReNr.").reset_index(drop=True)
 
-    output = pd.DataFrame()
-    output["satzart"] = ["0"] * len(df)
-    output["konto"] = ["200000"] * len(df)
-    output["gkonto"] = ["4000"] * len(df)
+    # Convert numeric values
+    betrag = pd.to_numeric(df["Brutto"].astype(str).str.replace(",", "."), errors="coerce")
+    steuer = -pd.to_numeric(df["Ust."].astype(str).str.replace(",", "."), errors="coerce")
 
-    output["belegnr"] = df["ReNr."]
-    output["belegdatum"] = df["Datum"]
-    output["buchsymbol"] = df["BS"]
-
-    output["buchcode"] = ["1"] * len(df)
-    output["prozent"] = ["20"] * len(df)
-    output["steuercode"] = ["1"] * len(df)
-
-    output["betrag"] = pd.to_numeric(
-        df["Brutto"].astype(str).str.replace(",", "."), errors="coerce"
-    )
-    output["steuer"] = -pd.to_numeric(
-        df["Ust."].astype(str).str.replace(",", "."), errors="coerce"
-    )
-
-    output["text"] = df["Name"]
+    # Assemble output dataframe
+    output = pd.DataFrame({
+        "satzart": ["0"] * len(df),
+        "konto": ["200000"] * len(df),
+        "gkonto": ["4000"] * len(df),
+        "belegnr": df["ReNr."],
+        "belegdatum": df["Datum"],
+        "buchsymbol": df["BS"],
+        "buchcode": ["1"] * len(df),
+        "prozent": ["20"] * len(df),
+        "steuercode": ["1"] * len(df),
+        "betrag": betrag,
+        "steuer": steuer,
+        "text": df["Name"]
+    })
 
     return output
+
 
 
 if uploaded_file:
