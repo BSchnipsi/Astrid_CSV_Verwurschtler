@@ -41,8 +41,13 @@ def transform(df):
     output["prozent"] = ["20"] * len(df)
     output["steuercode"] = ["1"] * len(df)
 
-    output["betrag"] = pd.to_numeric(df["Brutto"], errors="coerce")
-    output["steuer"] = -pd.to_numeric(df["Ust."], errors="coerce")
+output["betrag"] = pd.to_numeric(
+    df["Brutto"].astype(str).str.replace(",", "."), errors="coerce"
+)
+
+output["steuer"] = -pd.to_numeric(
+    df["Ust."].astype(str).str.replace(",", "."), errors="coerce"
+)
 
     output["text"] = df["Name"]
 
